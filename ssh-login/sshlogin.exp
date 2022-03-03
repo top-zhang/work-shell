@@ -1,0 +1,31 @@
+#!/usr/bin/expect -f
+
+set hostname [lindex $argv 0]
+set username [lindex $argv 1]
+set password [lindex $argv 2]
+set script [lindex $argv 3]
+set dir [lindex $argv 4]
+set servicen_name [lindex $argv 5]
+set version [lindex $argv 6]
+set port [lindex $argv 7]
+set timeout 30
+set force_conservative 1
+if {$force_conservative} {
+  set send_slow {128 .1}
+}
+
+if {$script!=""} {
+	spawn sh -c "ssh $username@$hostname 'bash -s' < $script $dir $servicen_name $version $port";
+} else {
+   spawn ssh $username@$hostname;
+}
+
+expect {
+    "yes/no" {
+    send -s "yes\r"; exp_continue 
+    }
+    "password" {
+        send -s "$password\r";
+    }
+}
+interact
